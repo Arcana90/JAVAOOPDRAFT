@@ -1,0 +1,18 @@
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Maven/Java
+target/
+*.class
+
+# Environment/secrets
+.env
+*.env
+application.properties
+config.properties
+
+# OS files
+.DS_Store
+Thumbs.db

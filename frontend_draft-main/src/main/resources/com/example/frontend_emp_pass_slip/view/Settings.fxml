@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox styleClass="screen" spacing="14" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.frontend_emp_pass_slip.controller.SettingsController">
+    <padding><Insets top="15" right="14" bottom="15" left="14" xmlns="http://javafx.com/javafx/17"/></padding>
+    <Label text="SYSTEM SETTINGS" styleClass="section-title" maxWidth="Infinity" />
+    <VBox styleClass="content-box" spacing="10" maxWidth="590" style="-fx-padding: 14;">
+        <Label text="USER INFORMATION" style="-fx-font-weight: bold;" />
+        <GridPane hgap="70" vgap="8">
+            <Label text="Username:" GridPane.rowIndex="0" />
+            <Label text="admin" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label text="Role:" GridPane.rowIndex="1" />
+            <Label text="System Administrator" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Department:" GridPane.rowIndex="2" />
+            <Label text="HR Division" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Last Login:" GridPane.rowIndex="3" />
+            <Label fx:id="lastLoginLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        </GridPane>
+    </VBox>
+    <VBox styleClass="content-box" spacing="9" maxWidth="590" style="-fx-padding: 14;">
+        <Label text="SYSTEM CONFIGURATION" style="-fx-font-weight: bold;" />
+        <Label text="Default Time Format" /><TextField fx:id="timeFormatField" text="24h" />
+        <Label text="Date Format" /><TextField fx:id="dateFormatField" text="YYYY-MM-DD" />
+        <Label text="Auto-logout Timer (minutes)" /><TextField fx:id="autoLogoutField" text="30" />
+        <Label fx:id="statusLabel" />
+        <Button text="Save Settings" onAction="#saveSettings" styleClass="primary-button" />
+    </VBox>
+    <VBox styleClass="content-box" spacing="8" maxWidth="590" style="-fx-padding: 14;">
+        <Label text="SECURITY" style="-fx-font-weight: bold;" />
+        <Button text="Change Password" onAction="#showUnavailable" maxWidth="Infinity" styleClass="outline-button" />
+        <Button text="View Activity Log" onAction="#showUnavailable" maxWidth="Infinity" styleClass="outline-button" />
+        <Button text="Backup Database" onAction="#showUnavailable" maxWidth="Infinity" styleClass="outline-button" />
+    </VBox>
+</VBox>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane styleClass="app-root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.frontend_emp_pass_slip.controller.MainLayoutController">
+    <stylesheets>
+        <URL value="@../css/style.css" />
+    </stylesheets>
+
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="8">
+            <Label text="Employee Pass Slip Issuance &amp; Monitoring" style="-fx-font-weight: bold;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="employeesOutLabel" text="0" styleClass="badge" />
+            <Label text="employees out" />
+            <Label fx:id="currentDateLabel" text="" styleClass="muted-text" />
+        </HBox>
+    </top>
+
+    <left>
+        <VBox styleClass="sidebar-box">
+            <fx:define><ToggleGroup fx:id="navGroup" /></fx:define>
+            <ToggleButton fx:id="dashboardButton" text="Dashboard" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadDashboard" />
+            <ToggleButton fx:id="employeeButton" text="Employee Management" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadEmployeeMgmt" />
+            <ToggleButton fx:id="passSlipButton" text="Pass Slip Issuance" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadPassSlip" />
+            <ToggleButton fx:id="monitoringButton" text="Monitoring" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadMonitoring" />
+            <ToggleButton fx:id="reportsButton" text="Reports" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadReports" />
+            <ToggleButton fx:id="settingsButton" text="Settings" toggleGroup="$navGroup" styleClass="nav-button" onAction="#loadSettings" />
+            <Region VBox.vgrow="ALWAYS" />
+            <Button text="Logout" styleClass="logout-button" onAction="#logout" />
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea" />
+    </center>
+</BorderPane>

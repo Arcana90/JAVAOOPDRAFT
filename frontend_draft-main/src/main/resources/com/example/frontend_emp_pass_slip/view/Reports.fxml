@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+
+<VBox styleClass="screen" spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.frontend_emp_pass_slip.controller.ReportsController">
+    <padding><Insets top="15" right="14" bottom="15" left="14"/></padding>
+    <Label text="REPORT GENERATION" styleClass="section-title" maxWidth="Infinity" />
+    <HBox spacing="12">
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS"><Label fx:id="totalSlipsLabel" text="0" styleClass="stat-number" /><Label text="Total Slips" /></VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" style="-fx-border-color: #ff4b21;"><Label fx:id="currentlyOutLabel" text="0" styleClass="stat-number danger-text" /><Label text="Currently Out" /></VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS"><Label fx:id="officialLabel" text="0" styleClass="stat-number" /><Label text="Official" /></VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS"><Label fx:id="avgDurationLabel" text="0h 0m" styleClass="stat-number" /><Label text="Avg Duration" /></VBox>
+    </HBox>
+
+    <VBox styleClass="table-panel" prefHeight="320"> <HBox styleClass="section-title" alignment="CENTER_LEFT" spacing="8">
+        <Label text="DAILY ACTIVITY - THIS WEEK" style="-fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="Daily" styleClass="primary-button" />
+        <Button text="Monthly" styleClass="outline-button" />
+        <Button text="Print" styleClass="outline-button" />
+    </HBox>
+
+        <BarChart fx:id="activityChart" animated="true" VBox.vgrow="ALWAYS">
+            <xAxis>
+                <CategoryAxis fx:id="dayAxis" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="valueAxis" side="LEFT" autoRanging="true" tickUnit="1" minorTickCount="0" />
+            </yAxis>
+        </BarChart>
+    </VBox>
+
+    <TableView fx:id="reportsTable" prefHeight="190">
+        <columns>
+            <TableColumn fx:id="departmentCol" text="Department" prefWidth="250" />
+            <TableColumn fx:id="totalCol" text="Total" prefWidth="140" />
+            <TableColumn fx:id="officialCol" text="Official" prefWidth="180" />
+            <TableColumn fx:id="personalCol" text="Personal" prefWidth="180" />
+            <TableColumn fx:id="avgDurationCol" text="Avg Duration" prefWidth="260" />
+        </columns>
+    </TableView>
+</VBox>

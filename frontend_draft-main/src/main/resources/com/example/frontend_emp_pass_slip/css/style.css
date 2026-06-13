@@ -1,0 +1,223 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 12px;
+    -fx-text-fill: #06285a;
+}
+
+.app-root,
+.screen {
+    -fx-background-color: #dff0fb;
+}
+
+.login-root {
+    -fx-background-color: #dff0fb;
+}
+
+.login-card {
+    -fx-border-color: #78b7ff;
+    -fx-border-width: 1;
+    -fx-background-color: rgba(255, 255, 255, 0.20);
+    -fx-padding: 18;
+}
+
+.logo-circle {
+    -fx-fill: #aedcff;
+    -fx-stroke: #77baff;
+}
+
+.top-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #9dcfff transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 12 14;
+}
+
+.sidebar-box {
+    -fx-background-color: #123a66;
+    -fx-pref-width: 196;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b9d9f5;
+    -fx-pref-width: 196;
+    -fx-min-height: 37;
+    -fx-padding: 0 16;
+    -fx-alignment: center-left;
+    -fx-font-weight: bold;
+}
+
+.nav-button:selected,
+.nav-button:hover {
+    -fx-background-color: #2d63ff;
+    -fx-text-fill: white;
+}
+
+.logout-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #27649d transparent transparent transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-pref-width: 196;
+    -fx-min-height: 56;
+    -fx-alignment: center-left;
+    -fx-padding: 0 24;
+}
+
+.section-title {
+    -fx-background-color: #e9f4fe;
+    -fx-border-color: #83c0ff;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 12;
+    -fx-font-weight: bold;
+}
+
+.stat-card,
+.content-box,
+.table-panel {
+    -fx-background-color: #eaf5ff;
+    -fx-border-color: #7dbdff;
+    -fx-border-width: 1;
+}
+
+.stat-card {
+    -fx-padding: 11 12;
+}
+
+.stat-number {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #164477;
+}
+
+.danger-text {
+    -fx-text-fill: #ff4b21;
+}
+
+.muted-text {
+    -fx-text-fill: #45657f;
+}
+
+.primary-button {
+    -fx-background-color: #2f63f4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-background-radius: 0;
+}
+
+.outline-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #78b7ff;
+    -fx-text-fill: #06305f;
+    -fx-padding: 7 14;
+    -fx-background-radius: 0;
+}
+
+.badge {
+    -fx-background-color: #ff4b21;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7;
+}
+
+.text-field,
+.password-field,
+.text-area,
+.combo-box {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: #7dbdff;
+    -fx-background-color: white;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #7dbdff;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header,
+.table-view .column-header-background .filler {
+    -fx-background-color: #d5ecfc;
+    -fx-border-color: #9cccff;
+}
+
+.table-view .table-cell {
+    -fx-border-color: #b4d9ff;
+    -fx-text-fill: #042d61;
+}
+
+.table-row-cell {
+    -fx-background-color: #eaf5ff;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #deeffb;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #b9dcff;
+}
+
+/* Color styling for the first series (Official - Blue) */
+.default-color0.chart-bar {
+    -fx-bar-fill: #2f69ff;
+    -fx-background-radius: 2 2 0 0;
+}
+
+/* Color styling for the second series (Personal - Coral/Orange) */
+.default-color1.chart-bar {
+    -fx-bar-fill: #ff4b21;
+    -fx-background-radius: 2 2 0 0;
+}
+
+/* Optional styling fixes for cleaner charts */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #e0e0e0;
+    -fx-stroke-dash-array: 2 2;
+}
+
+/* =========================================================================
+   Interactive Bar Chart Tooltip & Popup Highlight Elements
+   ========================================================================= */
+
+/* Main layout box wrapper for the hover window */
+.chart-hover-popup {
+    -fx-background-color: #ffffff;
+    -fx-padding: 12px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 10, 0, 0, 4);
+}
+
+/* Header/Day Label styling */
+.chart-hover-title {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Data point list items */
+.chart-hover-official {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2563eb;
+}
+
+.chart-hover-personal {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ea580c;
+}
