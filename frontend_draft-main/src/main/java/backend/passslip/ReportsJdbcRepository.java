@@ -12,6 +12,7 @@ public class ReportsJdbcRepository {
 
     public ReportsStats getStats() {
         Connection connection = null;
+
         try {
             connection = ConnectionPoolManager.getInstance().acquire();
 
@@ -40,6 +41,7 @@ public class ReportsJdbcRepository {
                     official,
                     formatDuration(avgMinutes)
             );
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ReportsStats(0, 0, 0, "0m");
@@ -71,26 +73,27 @@ public class ReportsJdbcRepository {
 
         try {
             connection = ConnectionPoolManager.getInstance().acquire();
+
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {
 
                 while (resultSet.next()) {
-                    int avgMinutes = resultSet.getInt("avg_duration_minutes");
-
                     summaries.add(new ReportDepartmentSummary(
                             resultSet.getString("department"),
                             resultSet.getInt("total_slips"),
                             resultSet.getInt("official_count"),
                             resultSet.getInt("personal_count"),
-                            formatDuration(avgMinutes)
+                            formatDuration(resultSet.getInt("avg_duration_minutes"))
                     ));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             ConnectionPoolManager.getInstance().release(connection);
         }
+
         return summaries;
     }
 
@@ -99,14 +102,14 @@ public class ReportsJdbcRepository {
         Connection connection = null;
 
         String sql = """
-                SELECT 
+                SELECT
                     CASE EXTRACT(ISODOW FROM date_issued)
                         WHEN 1 THEN 'Mon'
                         WHEN 2 THEN 'Tue'
                         WHEN 3 THEN 'Wed'
                         WHEN 4 THEN 'Thu'
                         WHEN 5 THEN 'Fri'
-                    END as day_of_week,
+                    END AS day_of_week,
                     COUNT(*) FILTER (
                         WHERE reason_for_leaving ILIKE 'Type: Official Business%'
                     ) AS official_count,
@@ -122,6 +125,7 @@ public class ReportsJdbcRepository {
 
         try {
             connection = ConnectionPoolManager.getInstance().acquire();
+
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {
 
@@ -133,21 +137,63 @@ public class ReportsJdbcRepository {
                     ));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             ConnectionPoolManager.getInstance().release(connection);
         }
+
         return dailySummaries;
+    }
+
+    public List<MonthlyActivitySummary> findMonthlyActivity() {
+        List<MonthlyActivitySummary> monthlyData = new ArrayList<>();
+        Connection connection = null;
+
+        String sql = """
+                SELECT
+                    TRIM(TO_CHAR(date_issued, 'Mon')) AS month_name,
+                    COUNT(*) AS total_slips
+                FROM pass_slips
+                WHERE date_issued >= CURRENT_DATE - INTERVAL '1 year'
+                GROUP BY
+                    EXTRACT(YEAR FROM date_issued),
+                    EXTRACT(MONTH FROM date_issued),
+                    TRIM(TO_CHAR(date_issued, 'Mon'))
+                ORDER BY
+                    EXTRACT(YEAR FROM date_issued),
+                    EXTRACT(MONTH FROM date_issued)
+                """;
+
+        try {
+            connection = ConnectionPoolManager.getInstance().acquire();
+
+            try (PreparedStatement statement = connection.prepareStatement(sql);
+                 ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    monthlyData.add(new MonthlyActivitySummary(
+                            resultSet.getString("month_name"),
+                            resultSet.getInt("total_slips")
+                    ));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionPoolManager.getInstance().release(connection);
+        }
+
+        return monthlyData;
     }
 
     private int count(Connection connection, String sql) throws Exception {
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-            return 0;
+
+            return resultSet.next() ? resultSet.getInt(1) : 0;
         }
     }
 
@@ -157,21 +203,25 @@ public class ReportsJdbcRepository {
                 FROM pass_slips
                 WHERE duration_minutes IS NOT NULL
                 """;
+
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-                return resultSet.getInt("avg_minutes");
-            }
-            return 0;
+
+            return resultSet.next()
+                    ? resultSet.getInt("avg_minutes")
+                    : 0;
         }
     }
 
     private String formatDuration(int minutes) {
         if (minutes <= 0) return "0m";
+
         int hours = minutes / 60;
         int remainingMinutes = minutes % 60;
+
         if (hours == 0) return remainingMinutes + "m";
         if (remainingMinutes == 0) return hours + "h";
+
         return hours + "h " + remainingMinutes + "m";
     }
 }
