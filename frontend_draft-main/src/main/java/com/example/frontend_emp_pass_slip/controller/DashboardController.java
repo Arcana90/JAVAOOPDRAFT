@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
-
+import backend.app.AppSettingsManager;
 public class DashboardController {
 
     @FXML private Label totalEmployeesLabel;
@@ -61,13 +61,12 @@ public class DashboardController {
         }
 
         for (DashboardSlipRecord record : summary.getCurrentlyOut()) {
+            // FORMAT THE TIME OUT
+            String formattedTimeOut = AppSettingsManager.getInstance().formatTimeString(record.getTimeOut());
+
             currentlyOutList.getChildren().add(createNameLabel(record.getEmployeeName()));
             currentlyOutList.getChildren().add(createDetailLabel(
-                    record.getDepartment()
-                            + " - Out "
-                            + record.getTimeOut()
-                            + " - "
-                            + record.getDuration()
+                    record.getDepartment() + " - Out " + formattedTimeOut + " - " + record.getDuration()
             ));
             currentlyOutList.getChildren().add(new Separator());
         }
@@ -84,17 +83,13 @@ public class DashboardController {
         }
 
         for (DashboardSlipRecord record : summary.getRecentActivity()) {
-            currentlyOutList.setFillWidth(true);
+            // FORMAT BOTH TIMES
+            String formattedTimeOut = AppSettingsManager.getInstance().formatTimeString(record.getTimeOut());
+            String formattedTimeIn = AppSettingsManager.getInstance().formatTimeString(record.getTimeIn());
 
             recentActivityList.getChildren().add(createNameLabel(record.getEmployeeName()));
             recentActivityList.getChildren().add(createDetailLabel(
-                    record.getTimeOut()
-                            + " - "
-                            + record.getTimeIn()
-                            + " - "
-                            + record.getDuration()
-                            + " - "
-                            + record.getStatus()
+                    formattedTimeOut + " - " + formattedTimeIn + " - " + record.getDuration() + " - " + record.getStatus()
             ));
             recentActivityList.getChildren().add(new Separator());
         }

@@ -10,7 +10,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-
+import backend.app.AppSettingsManager;
 public class MonitoringController {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> statusFilter;
@@ -47,35 +47,23 @@ public class MonitoringController {
     }
 
     private void setupColumns() {
-        slipNoColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getSlipNo()));
+        slipNoColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getSlipNo()));
+        employeeIdColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getEmployeeId()));
+        nameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getName()));
+        departmentColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getDepartment()));
+        durationColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getDuration()));
+        typeColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getType()));
+        statusColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getStatus()));
 
-        employeeIdColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getEmployeeId()));
-
-        nameColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getName()));
-
-        departmentColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getDepartment()));
-
+        // --- APPLY GLOBAL FORMATTING TO DATES AND TIMES ---
         dateColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getDate()));
+                new ReadOnlyStringWrapper(AppSettingsManager.getInstance().formatDateString(data.getValue().getDate())));
 
         timeOutColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getTimeOut()));
+                new ReadOnlyStringWrapper(AppSettingsManager.getInstance().formatTimeString(data.getValue().getTimeOut())));
 
         timeInColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getTimeIn()));
-
-        durationColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getDuration()));
-
-        typeColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getType()));
-
-        statusColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getStatus()));
+                new ReadOnlyStringWrapper(AppSettingsManager.getInstance().formatTimeString(data.getValue().getTimeIn())));
     }
 
     private void setupFilters() {
@@ -148,22 +136,20 @@ public class MonitoringController {
         ComboBox<String> remarks = new ComboBox<>(FXCollections.observableArrayList(
                 "Returned on time", "Returned late", "For review"
         ));
-
         remarks.getSelectionModel().selectFirst();
+
+        // Format the Time Out string for the dialog display!
+        String formattedTimeOut = AppSettingsManager.getInstance().formatTimeString(record.getTimeOut());
 
         form.addRow(0, new Label("Slip No:"), new Label(record.getSlipNo()));
         form.addRow(1, new Label("Employee Name:"), new Label(record.getName()));
         form.addRow(2, new Label("Department:"), new Label(record.getDepartment()));
-        form.addRow(3, new Label("Time Out:"), new Label(record.getTimeOut()));
+        form.addRow(3, new Label("Time Out:"), new Label(formattedTimeOut));
         form.addRow(4, new Label("Remarks:"), remarks);
 
         dialog.getDialogPane().setContent(form);
 
-        ButtonType confirmButtonType = new ButtonType(
-                "Confirm Time-In",
-                ButtonBar.ButtonData.OK_DONE
-        );
-
+        ButtonType confirmButtonType = new ButtonType("Confirm Time-In", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(response -> {

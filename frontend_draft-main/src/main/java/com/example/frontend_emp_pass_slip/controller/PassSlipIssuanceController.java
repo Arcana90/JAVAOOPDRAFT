@@ -4,6 +4,7 @@ import backend.employee.Employee;
 import backend.employee.EmployeeRepository;
 import backend.passslip.PassSlipJdbcRepository;
 import backend.passslip.PassSlipJdbcRepository.IssuePassSlipResult;
+import backend.app.AppSettingsManager; // Ensures global formatting is applied
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -12,13 +13,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.List;
 
 public class PassSlipIssuanceController {
-
-    private static final DateTimeFormatter DISPLAY_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
     @FXML private ComboBox<Employee> employeeComboBox;
     @FXML private ComboBox<String> passTypeComboBox;
@@ -27,7 +25,7 @@ public class PassSlipIssuanceController {
     @FXML private TextField supervisorField;
     @FXML private TextField destinationField;
     @FXML private TextArea reasonTextArea;
-    @FXML private Label timeOutLabel;
+    @FXML private Label timeOutLabel; // Correctly mapped to Label
     @FXML private Label statusLabel;
 
     private final EmployeeRepository employeeRepository = new EmployeeRepository();
@@ -44,7 +42,7 @@ public class PassSlipIssuanceController {
 
         fillEmployee(employeeComboBox.getValue());
 
-        updateTimeOutLabel();
+        updateTimeOutLabel(); // Automatically updates when screen loads
     }
 
     private void setupEmployeeComboBox() {
@@ -61,7 +59,6 @@ public class PassSlipIssuanceController {
                 if (employee == null) {
                     return "";
                 }
-
                 return employee.getFullName() + " (" + employee.getEmployeeId() + ")";
             }
 
@@ -98,14 +95,8 @@ public class PassSlipIssuanceController {
         }
 
         String passType = passTypeComboBox.getValue();
-
-        String destination = destinationField.getText() == null
-                ? ""
-                : destinationField.getText().trim();
-
-        String reason = reasonTextArea.getText() == null
-                ? ""
-                : reasonTextArea.getText().trim();
+        String destination = destinationField.getText() == null ? "" : destinationField.getText().trim();
+        String reason = reasonTextArea.getText() == null ? "" : reasonTextArea.getText().trim();
 
         if (destination.isBlank()) {
             showStatus("Destination is required.", true);
@@ -129,10 +120,13 @@ public class PassSlipIssuanceController {
         );
 
         if (result.isSuccess()) {
+            // Apply global 12h/24h setting to the success message
+            String formattedTimeOut = AppSettingsManager.getInstance().formatTime(LocalTime.now());
+
             showStatus(
                     "Pass slip issued for " + selectedEmployee.getFullName()
                             + ". Slip ID: " + result.getPassSlipId()
-                            + ". Time-Out: " + DISPLAY_TIME.format(LocalDateTime.now()),
+                            + ". Time-Out: " + formattedTimeOut,
                     false
             );
 
@@ -169,8 +163,10 @@ public class PassSlipIssuanceController {
         statusLabel.setStyle(error ? "-fx-text-fill: #b00020;" : "-fx-text-fill: #0b6b2b;");
     }
 
+    // Fixed dynamic time display to rely on the centralized Manager
     private void updateTimeOutLabel() {
-        timeOutLabel.setText("Time-Out will be automatically recorded as: "
-                + DISPLAY_TIME.format(LocalDateTime.now()));
+        LocalTime currentTime = LocalTime.now();
+        String formattedTime = AppSettingsManager.getInstance().formatTime(currentTime);
+        timeOutLabel.setText("Time-Out will be automatically recorded as: " + formattedTime);
     }
 }

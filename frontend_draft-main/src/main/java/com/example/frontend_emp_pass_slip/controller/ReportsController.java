@@ -114,13 +114,14 @@ public class ReportsController {
 
     private void switchToDailyView() {
         isDailyView = true;
-        if(chartTitleLabel != null) chartTitleLabel.setText("DAILY ACTIVITY - THIS WEEK");
+        if (chartTitleLabel != null) chartTitleLabel.setText("DAILY ACTIVITY - THIS WEEK");
 
         dailyBtn.setStyle("-fx-background-color: #2962ff; -fx-text-fill: white;");
         monthlyBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #333333; -fx-border-color: #cccccc; -fx-border-radius: 3;");
 
         activityChart.getData().clear();
-        dayAxis.setCategories(FXCollections.observableArrayList("Mon", "Tue", "Wed", "Thu", "Fri"));
+        // Added Sat and Sun here
+        dayAxis.setCategories(FXCollections.observableArrayList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
         updateDailyData();
         activityChart.getData().addAll(List.of(officialSeries, personalSeries));
     }
@@ -150,7 +151,8 @@ public class ReportsController {
         Map<String, DailyActivitySummary> dataMap = new HashMap<>();
         for (DailyActivitySummary s : dbData) dataMap.put(s.getDay(), s);
 
-        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+        // Added Sat and Sun here
+        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
         for (String day : days) {
             DailyActivitySummary summary = dataMap.getOrDefault(day, new DailyActivitySummary(day, 0, 0));

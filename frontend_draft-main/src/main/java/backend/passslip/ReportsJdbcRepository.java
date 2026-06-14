@@ -109,6 +109,8 @@ public class ReportsJdbcRepository {
                         WHEN 3 THEN 'Wed'
                         WHEN 4 THEN 'Thu'
                         WHEN 5 THEN 'Fri'
+                        WHEN 6 THEN 'Sat'
+                        WHEN 7 THEN 'Sun'
                     END AS day_of_week,
                     COUNT(*) FILTER (
                         WHERE reason_for_leaving ILIKE 'Type: Official Business%'
@@ -118,7 +120,7 @@ public class ReportsJdbcRepository {
                     ) AS personal_count
                 FROM pass_slips
                 WHERE date_issued >= DATE_TRUNC('week', CURRENT_DATE)
-                  AND EXTRACT(ISODOW FROM date_issued) BETWEEN 1 AND 5
+                  AND EXTRACT(ISODOW FROM date_issued) BETWEEN 1 AND 7
                 GROUP BY EXTRACT(ISODOW FROM date_issued)
                 ORDER BY EXTRACT(ISODOW FROM date_issued)
                 """;
