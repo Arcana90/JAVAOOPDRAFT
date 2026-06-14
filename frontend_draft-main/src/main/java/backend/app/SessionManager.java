@@ -1,4 +1,4 @@
-package backend.app; // Change this to match your folder structure
+package backend.app;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -12,48 +12,48 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SessionManager {
+    private static SessionManager instance;
+
     private Timer timer;
-    private final Stage stage; // CRITICAL FIX: Track the Stage, not the Scene
-    private final Runnable logoutAction;
-    private final int timeoutMinutes;
+    private Stage stage;
+    private Runnable logoutAction;
+    private int timeoutMinutes;
 
     private Alert warningDialog;
     private boolean isWarningShowing = false;
+    private boolean isTrackingActive = false; // CRITICAL: Safety guard flag
 
-    // Constructor now requires the Stage
-    public SessionManager(Stage stage, int timeoutMinutes, Runnable logoutAction) {
+    private SessionManager() {}
+
+    public static SessionManager getInstance() {
+        if (instance == null) {
+            instance = new SessionManager();
+        }
+        return instance;
+    }
+
+    public void initialize(Stage stage, int timeoutMinutes, Runnable logoutAction) {
         this.stage = stage;
         this.timeoutMinutes = timeoutMinutes;
         this.logoutAction = logoutAction;
 
-        setupActivityMonitors();
-        startTimer();
+        // Attach global filters to the Stage
+        this.stage.addEventFilter(MouseEvent.ANY, e -> resetTimer());
+        this.stage.addEventFilter(KeyEvent.ANY, e -> resetTimer());
     }
 
-    private void setupActivityMonitors() {
-        // Event filters on the Stage intercept every single click/type globally
-        stage.addEventFilter(MouseEvent.ANY, e -> resetTimer());
-        stage.addEventFilter(KeyEvent.ANY, e -> resetTimer());
-    }
+    public void startTimer() {
+        stopTimer(); // Clear any existing routines first
 
-    public void resetTimer() {
-        // Don't let background mouse movements reset the timer IF the warning is already on screen.
-        if (isWarningShowing) return;
-
-        if (timer != null) timer.cancel();
-        startTimer();
-    }
-
-    private void startTimer() {
-        timer = new Timer(true); // Run as a daemon thread
+        isTrackingActive = true; // Turn on tracking status
+        timer = new Timer(true);
 
         long timeoutMillis = timeoutMinutes * 60 * 1000L;
-        long warningMillis = timeoutMillis - 30000L; // Show warning 30 seconds BEFORE timeout
+        long warningMillis = timeoutMillis - 30000L;
 
-        // Safety check: if they set the timer to 1 minute, show warning at 15 seconds
         if (warningMillis <= 0) warningMillis = 15000L;
 
-        // 1. Schedule the Warning Pop-up
+        // 1. Schedule Warning Dialog
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -61,19 +61,46 @@ public class SessionManager {
             }
         }, warningMillis);
 
-        // 2. Schedule the Actual Logout
+        // 2. Schedule Forced Logout
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> executeLogout());
             }
         }, timeoutMillis);
+
+    }
+
+    public void updateTimeout(int newTimeoutMinutes) {
+        this.timeoutMinutes = newTimeoutMinutes;
+        startTimer();
+    }
+
+    public void stopTimer() {
+        isTrackingActive = false; // CRITICAL: Stop listening to mouse/key movements
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+            timer = null;
+        }
+    }
+
+    public void resetTimer() {
+        // Only reset if tracking is explicitly active and warning isn't showing
+        if (!isTrackingActive || isWarningShowing) return;
+
+        startTimer();
     }
 
     private void showWarningDialog() {
+        if (!isTrackingActive || isWarningShowing) return;
         isWarningShowing = true;
 
         warningDialog = new Alert(Alert.AlertType.WARNING);
+        if (stage != null) {
+            warningDialog.initOwner(stage);
+        }
+
         warningDialog.setTitle("Session Inactive");
         warningDialog.setHeaderText("Are you still there?");
         warningDialog.setContentText("Your session has been inactive and will expire in 30 seconds.");
@@ -81,11 +108,11 @@ public class SessionManager {
         ButtonType imStillHereBtn = new ButtonType("I'm Still Here");
         warningDialog.getButtonTypes().setAll(imStillHereBtn);
 
-        // Wait for the user to click the button
         Optional<ButtonType> result = warningDialog.showAndWait();
+
         if (result.isPresent() && result.get() == imStillHereBtn) {
             isWarningShowing = false;
-            resetTimer(); // Restart the clock!
+            resetTimer();
         }
     }
 
@@ -94,12 +121,11 @@ public class SessionManager {
             warningDialog.close();
         }
 
-        if (timer != null) timer.cancel();
+        isWarningShowing = false;
+        stopTimer();
 
-        logoutAction.run();
-    }
-
-    public void stopTimer() {
-        if (timer != null) timer.cancel();
+        if (logoutAction != null) {
+            logoutAction.run();
+        }
     }
 }

@@ -90,6 +90,10 @@ public class MainLayoutController {
 
     @FXML
     private void logout() throws IOException {
+        // 1. STOP THE TIMER! This ensures it doesn't keep running in the background.
+        backend.app.SessionManager.getInstance().stopTimer();
+
+        // 2. Load the Login screen
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/example/frontend_emp_pass_slip/view/Login.fxml")
         );

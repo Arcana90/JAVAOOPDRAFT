@@ -12,8 +12,6 @@ import java.io.IOException;
 
 public class HelloApplication extends Application {
 
-    private SessionManager sessionManager;
-
     @Override
     public void start(Stage stage) throws IOException {
         initializeDatabase();
@@ -30,7 +28,6 @@ public class HelloApplication extends Application {
         stage.setMinHeight(680);
         stage.show();
 
-        // CRITICAL FIX: Pass the STAGE, not the scene!
         startAutoLogout(stage);
     }
 
@@ -53,15 +50,12 @@ public class HelloApplication extends Application {
             ConnectionPoolManager.getInstance().shutdown();
             System.out.println("Database pool shut down.");
         } catch (IllegalStateException e) {
-            // Pool was never initialized
+            // Pool not initialized
         }
 
-        if (sessionManager != null) {
-            sessionManager.stopTimer();
-        }
+        SessionManager.getInstance().stopTimer();
     }
 
-    // CRITICAL FIX: Method signature now accepts Stage
     private void startAutoLogout(Stage stage) {
         int minutes = AppSettingsManager.getInstance().getAutoLogoutTimer();
 
@@ -73,27 +67,21 @@ public class HelloApplication extends Application {
                     FXMLLoader loader = new FXMLLoader(
                             HelloApplication.class.getResource("/com/example/frontend_emp_pass_slip/view/Login.fxml")
                     );
-
                     Scene loginScene = new Scene(loader.load(), 1280, 768);
 
-                    // We already have the stage, so we can just use it directly!
                     stage.setScene(loginScene);
                     stage.centerOnScreen();
 
-                    AppSettingsManager.getInstance().stopTracker();
-
-                    // Optional: If you want the timer to start again immediately on the login screen:
-                    // startAutoLogout(stage);
+                    SessionManager.getInstance().stopTimer();
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.err.println("Auto-logout failed to load Login.fxml view config.");
                 }
             });
         };
 
-        // Pass the stage into the new SessionManager
-        sessionManager = new SessionManager(stage, minutes, doLogout);
+        // Pre-configure rules hook constraints without running counter engine
+        SessionManager.getInstance().initialize(stage, minutes, doLogout);
     }
 
     public static void main(String[] args) {

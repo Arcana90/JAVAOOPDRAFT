@@ -1,6 +1,7 @@
 package com.example.frontend_emp_pass_slip.controller;
 
 import backend.app.AppSettingsManager;
+import backend.app.SessionManager; // FIXED: Added missing import statement
 import backend.app.SettingsRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -20,11 +21,9 @@ public class SettingsController {
 
     @FXML
     private void initialize() {
-        // Initialize choices inside UI dropdown boxes
         timeFormatComboBox.getItems().addAll("12h", "24h");
         dateFormatComboBox.getItems().addAll("YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY");
 
-        // Format system label initialization dynamically
         lastLoginLabel.setText(
                 AppSettingsManager.getInstance().formatDateTime(LocalDateTime.now())
         );
@@ -65,10 +64,14 @@ public class SettingsController {
         boolean saved = settingsRepository.saveSettings(timeFormat, dateFormat, autoLogout);
 
         if (saved) {
-            // SYNC ALL SYSTEM MODULES IMMEDIATELY
+            // 1. Sync global cache data directly from DB
             AppSettingsManager.getInstance().refreshSettings();
 
-            // Re-render dashboard text timestamp layout to match the update choice configuration
+            // 2. FIXED: Safely pass the new timer limit inside the execution block
+            int newTimerValue = AppSettingsManager.getInstance().getAutoLogoutTimer();
+            SessionManager.getInstance().updateTimeout(newTimerValue);
+
+            // Re-render dashboard text timestamp layout
             lastLoginLabel.setText(AppSettingsManager.getInstance().formatDateTime(LocalDateTime.now()));
             showStatus("Settings saved and updated successfully across the system.", "#0b6b2b");
         } else {
@@ -80,6 +83,7 @@ public class SettingsController {
         statusLabel.setText(message);
         statusLabel.setStyle("-fx-text-fill: " + hexColor + ";");
     }
+
     @FXML
     private void showUnavailable() {
         showStatus("This action is not connected yet.", "#555555");
